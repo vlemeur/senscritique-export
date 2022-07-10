@@ -1,0 +1,21 @@
+{
+  "template": "git@github.com:vlemeur/vlm-coockiecutter.git",
+  "commit": "5bc86e78061768c588827d447d045e7f816589bd",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "author": "Vincent LE MEUR",
+      "email": "vincenlemeur@gmail.com",
+      "project_folder": "senscritique-export",
+      "package_name": "senscritique_export",
+      "repository_url": "https://github.com/vlemeur/senscritique-export",
+      "project_short_description": "Python scripts and module to export data from Senscritique.com",
+      "data_analysis": "y",
+      "check_dependencies_updates": "n",
+      "documentation": "y",
+      "version": "0.0.0",
+      "_template": "git@github.com:vlemeur/vlm-coockiecutter.git"
+    }
+  },
+  "directory": null
+}
