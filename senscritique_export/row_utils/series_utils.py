@@ -1,3 +1,4 @@
+"""Useful functions for series items"""
 import logging
 from typing import Dict, List
 

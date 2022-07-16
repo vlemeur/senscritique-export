@@ -1,3 +1,4 @@
+"""Useful functions for videogames items"""
 import logging
 from typing import Dict, List
 

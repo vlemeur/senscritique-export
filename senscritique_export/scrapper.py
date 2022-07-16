@@ -1,8 +1,9 @@
+"""Main senscritique scrapper module"""
 import logging
+import sys
 from typing import Dict, List, Optional
 
 from senscritique_export.utils import (
-    Work,
     get_category_from_survey,
     get_closest_search_result,
     get_collection_info,
@@ -13,6 +14,7 @@ from senscritique_export.utils import (
     get_survey_info,
     get_topchart_info,
 )
+from senscritique_export.worker import Work
 
 logger = logging.getLogger(__name__)
 
@@ -45,12 +47,11 @@ def get_user_collection(user: Optional[str] = None, url: Optional[str] = None) -
     logger.info("URL : %s", url)
     try:
         soup = get_soup(url)
-    except Exception as e:
-        logger.error(e)
-        exit()
+    except Exception as exception:
+        logger.error(exception)
+        sys.exit()
 
-    collection = get_collection_info(soup)
-    return collection
+    return get_collection_info(soup)
 
 
 def create_collection_filename(user: str, ext: str = "csv") -> str:
@@ -92,13 +93,12 @@ def get_topchart(url: str) -> List[Dict]:
     logger.info("URL : %s", url)
     try:
         soup = get_soup(url)
-    except Exception as e:
-        logger.error(e)
-        exit()
+    except Exception as exception:
+        logger.error(exception)
+        sys.exit()
 
     category = get_category_from_topchart_url(url)
-    topchart = get_topchart_info(soup, category)
-    return topchart
+    return get_topchart_info(soup, category)
 
 
 def get_category_from_topchart_url(url: str) -> str:
@@ -174,13 +174,12 @@ def get_survey(url: str) -> List[Dict]:
     logger.info("URL : %s", url)
     try:
         soup = get_soup(url)
-    except Exception as e:
-        logger.error(e)
-        exit()
+    except Exception as exception:
+        logger.error(exception)
+        sys.exit()
 
     category = get_category_from_survey(soup)
-    survey = get_survey_info(soup, category)
-    return survey
+    return get_survey_info(soup, category)
 
 
 def create_survey_filename(url: str, ext: str = "csv") -> str:
@@ -224,12 +223,11 @@ def get_list_work(url: str) -> List[Dict]:
     logger.info("URL : %s", url)
     try:
         soup = get_soup(url)
-    except Exception as e:
-        logger.error(e)
-        exit()
+    except Exception as exception:
+        logger.error(exception)
+        sys.exit()
 
-    list_work = get_list_work_info(soup)
-    return list_work
+    return get_list_work_info(soup)
 
 
 def create_list_work_filename(url: str, ext: str = "csv") -> str:
@@ -297,9 +295,9 @@ def get_url(search_term: str, rank: int = 1, genre: Optional[str] = None) -> Opt
 
     try:
         soup = get_soup(url)
-    except Exception as e:
-        logger.error(e)
-        exit()
+    except Exception as exception:
+        logger.error(exception)
+        sys.exit()
 
     return get_search_result(soup, rank)
 
@@ -332,7 +330,7 @@ def get_url_closest_match(search_term: str, genre: Optional[str] = None) -> Opti
 
     try:
         soup = get_soup(url)
-    except Exception as e:
-        raise Exception(e)
+    except Exception as exception:
+        raise Exception(exception) from exception
 
     return get_closest_search_result(soup, search_term)

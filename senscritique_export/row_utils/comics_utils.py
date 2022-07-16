@@ -1,3 +1,4 @@
+"""Useful items for comics items"""
 import logging
 from typing import Dict, List
 

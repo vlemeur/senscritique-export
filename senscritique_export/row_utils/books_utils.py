@@ -1,3 +1,4 @@
+"""Useful functions for books items"""
 import logging
 from typing import Dict, List
 

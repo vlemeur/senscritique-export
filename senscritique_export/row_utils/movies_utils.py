@@ -1,3 +1,4 @@
+"""Useful functions for movies items"""
 import logging
 from typing import Dict, List
 

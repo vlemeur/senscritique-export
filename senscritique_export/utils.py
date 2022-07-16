@@ -1,3 +1,5 @@
+"""Useful functions used to scrap senscritique"""
+
 import difflib
 import logging
 import urllib
@@ -39,12 +41,26 @@ def get_soup(url: str) -> BeautifulSoup:
 
 
 def format_number(number: str) -> str:
-    if "K" in number and "." in number:
-        return number.replace("K", "").replace(".", "") + "00"
-    elif "K" in number and "." not in number:
-        return number.replace("K", "") + "000"
-    else:
-        return number
+    """Format number
+
+    Parameters
+    ----------
+    number : str
+        number to format
+
+    Returns
+    -------
+    str
+        formatted number
+    """
+    result = number
+    if "K" in result:
+        if "." in result:
+            result = result.replace("K", "").replace(".", "") + "00"
+        else:
+            result = result.replace("K", "") + "000"
+
+    return result
 
 
 def get_collection_current_page_number(soup: BeautifulSoup) -> Optional[int]:
@@ -64,8 +80,8 @@ def get_collection_current_page_number(soup: BeautifulSoup) -> Optional[int]:
         page_number = int(soup.find("span", {"class": "eipa-current"}).text)
         logger.info("Current collection page number : %s", page_number)
         return page_number
-    except Exception as e:
-        logger.error(e)
+    except Exception as exception:
+        logger.error(exception)
         return None
 
 
@@ -125,13 +141,12 @@ def get_next_collection_soup(soup: BeautifulSoup) -> BeautifulSoup:
     """
     next_col = get_next_collection_link(soup)
     logger.debug("Next collection link : %s", next_col)
-    if next_col:
-        try:
-            soup = get_soup(next_col)
-        except Exception as e:
-            logger.error(e)
-            return None
-    else:
+    if not next_col:
+        return None
+    try:
+        soup = get_soup(next_col)
+    except Exception as exception:
+        logger.error(exception)
         return None
     return soup
 
@@ -313,8 +328,8 @@ def get_list_work_current_page_number(soup: BeautifulSoup) -> Optional[int]:
         page_number = int(soup.find("span", {"class": "eipa-current"}).text)
         logger.info("Current list_work page number : %s", page_number)
         return page_number
-    except Exception as e:
-        logger.error(f"get_list_work_current_page_number: {e}")
+    except Exception as exception:
+        logger.error(f"get_list_work_current_page_number: {exception}")
         return None
 
 
@@ -356,13 +371,12 @@ def get_next_list_work_soup(soup: BeautifulSoup) -> BeautifulSoup:
     next_col = get_next_list_work_link(soup)
     soup.decompose()
     logger.debug("Next list_work link : %s", next_col)
-    if next_col:
-        try:
-            soup = get_soup(next_col)
-        except Exception as e:
-            logger.error(e)
-            return None
-    else:
+    if not next_col:
+        return None
+    try:
+        soup = get_soup(next_col)
+    except Exception as exception:
+        logger.error(exception)
         return None
     return soup
 
@@ -405,8 +419,7 @@ def get_list_work_info(soup: BeautifulSoup) -> List[Dict]:
     List[Dict]
         user list work information
     """
-    rows = get_rows_from_list_work(soup)
-    return rows
+    return get_rows_from_list_work(soup)
 
 
 def sanitize_text(text: str) -> str:
@@ -441,11 +454,11 @@ def get_search_url(search_term: str, genre: Optional[str] = None) -> str:
         search url
     """
     search_term_sanitized = sanitize_text(search_term)
-    if genre not in GENRE_CHOICES:
-        url = f"https://old.senscritique.com/search?q={search_term_sanitized}"
-    else:
-        url = f"https://old.senscritique.com/search?q={search_term_sanitized}&categories[0][0]={genre}"
-    return url
+    return (
+        f"https://old.senscritique.com/search?q={search_term_sanitized}"
+        if genre not in GENRE_CHOICES
+        else f"https://old.senscritique.com/search?q={search_term_sanitized}&categories[0][0]={genre}"
+    )
 
 
 def get_search_result(soup: BeautifulSoup, position: int) -> Optional[str]:
@@ -475,8 +488,8 @@ def get_search_result(soup: BeautifulSoup, position: int) -> Optional[str]:
             )
             return None
         return url_list[position - 1]
-    except Exception as e:
-        logger.error(e)
+    except Exception as exception:
+        logger.error(exception)
         return None
 
 
@@ -508,8 +521,7 @@ def get_closest_search_result(soup: BeautifulSoup, search_term: str) -> Optional
         ]:
             name = url.split("/")[-2:][0].replace("_", " ") if url else None
             list_candidates.append({"url": url, "name": name})
-        closest_match = difflib.get_close_matches(search_term, [x["name"] for x in list_candidates], 1)
-        if closest_match:
+        if closest_match := difflib.get_close_matches(search_term, [x["name"] for x in list_candidates], 1):
             closest_dict = next(
                 (item for item in list_candidates if item["name"] == closest_match[0]),
                 None,
@@ -519,8 +531,8 @@ def get_closest_search_result(soup: BeautifulSoup, search_term: str) -> Optional
             result = list_candidates[0].get("url")
         logger.info(f"{result=}")
         return result
-    except Exception as e:
-        raise Exception(e)
+    except Exception as exception:
+        raise Exception(exception) from exception
 
 
 def get_rows_from_survey(soup: BeautifulSoup) -> List[element.ResultSet]:
@@ -589,7 +601,7 @@ def get_survey_info(soup: BeautifulSoup, category: str) -> List[Dict]:
     return list_info
 
 
-def get_survey_order(category: str) -> List:
+def get_survey_order(category: str) -> List:  # pylint: disable=too-many-return-statements
     """Returns the order of columns for a survey based on its category.
 
     Parameters
@@ -602,21 +614,20 @@ def get_survey_order(category: str) -> List:
     List
         order of columns
     """
+    if category == "bd":
+        return get_order_comics_columns()
     if category == "films":
         return get_order_movies_columns()
-    elif category == "series":
-        return get_order_series_columns()
-    elif category == "jeuxvideo":
+    if category == "jeuxvideo":
         return get_order_videogames_columns()
-    elif category == "livres":
+    if category == "livres":
         return get_order_books_columns()
-    elif category == "bd":
-        return get_order_comics_columns()
-    elif category == "musique":
+    if category == "musique":
         return get_order_music_columns()
-    else:
-        logger.error(f"Category {category} not supported.")
-        return []
+    if category == "series":
+        return get_order_series_columns()
+    logger.error(f"Category {category} not supported.")
+    return []
 
 
 def get_rows_from_topchart(soup: BeautifulSoup) -> List[element.ResultSet]:
@@ -635,7 +646,7 @@ def get_rows_from_topchart(soup: BeautifulSoup) -> List[element.ResultSet]:
     return soup.find("ol", {"class": "elto-list"}).find_all("li", {"class": "elto-item"})
 
 
-def get_topchart_info(soup: BeautifulSoup, category: str) -> List[Dict]:
+def get_topchart_info(soup: BeautifulSoup, category: str) -> List[Dict]:  # pylint: disable=too-many-return-statements
     """Returns a list of dict containing data of a topchart.
 
     Parameters
@@ -653,19 +664,18 @@ def get_topchart_info(soup: BeautifulSoup, category: str) -> List[Dict]:
     rows = get_rows_from_topchart(soup)
     if category == "films":
         return [get_movies_info_from_row(x) for x in rows]
-    elif category == "series":
+    if category == "series":
         return [get_series_info_from_row(x) for x in rows]
-    elif category == "jeuxvideo":
+    if category == "jeuxvideo":
         return [get_videogames_topchart_info_from_row(x) for x in rows]
-    elif category == "livres":
+    if category == "livres":
         return [get_books_info_from_row(x) for x in rows]
-    elif category == "bd":
+    if category == "bd":
         return [get_comics_info_from_row(x) for x in rows]
-    elif category == "musique":
+    if category == "musique":
         return [get_music_info_from_row(x) for x in rows]
-    else:
-        logger.error(f"Category {category} not supported.")
-        return []
+    logger.error(f"Category {category} not supported.")
+    return []
 
 
 def get_topchart_order(category: str) -> List:
@@ -681,293 +691,19 @@ def get_topchart_order(category: str) -> List:
     List
         topchart order columns
     """
-    if category == "films":
-        return get_order_movies_columns()
-    elif category == "series":
-        return get_order_series_columns()
+    if category == "bd":
+        result = get_order_comics_columns()
+    elif category == "films":
+        result = get_order_movies_columns()
     elif category == "jeuxvideo":
-        return get_order_videogames_columns()
+        result = get_order_videogames_columns()
     elif category == "livres":
-        return get_order_books_columns()
-    elif category == "bd":
-        return get_order_comics_columns()
+        result = get_order_books_columns()
     elif category == "musique":
-        return get_order_music_columns()
+        result = get_order_music_columns()
+    elif category == "series":
+        result = get_order_series_columns()
     else:
+        result = []
         logger.error(f"Category {category} not supported.")
-        return []
-
-
-class Work:
-    def __init__(self, url):
-        self.url = url
-        self.category = self.get_category()
-        self.soup = get_soup(self.url)
-
-    def export(self) -> Dict[str]:
-        """Export information
-
-        Returns
-        -------
-        Dict[str]
-            information
-        """
-        return {
-            **{
-                "Title": self.title,
-                "URL": self.url,
-                "Rating": self.main_rating,
-                "Rating Details": self.rating_details,
-                "Year": self.year,
-                "Cover URL": self.cover_url,
-                "Review Count": self.review_count,
-                "Vote Count": self.vote_count,
-                "Favorite Count": self.favorite_count,
-                "Wishlist Count": self.wishlist_count,
-                "In Progress Count": self.in_progress_count,
-                "Description": self.description,
-            },
-            **self.get_complementary_info(),
-            **{"Category": self.category},
-        }
-
-    def get_category(self) -> str:
-        """Returns a category
-
-        Returns
-        -------
-        str
-            category
-        """
-        category = self.url.split("/")[3]
-        if category == "film":
-            return "Movie"
-        elif category == "serie":
-            return "Series"
-        elif category == "jeuvideo":
-            return "Video Game"
-        elif category == "livre":
-            return "Book"
-        elif category == "bd":
-            return "Comics"
-        elif category == "album":
-            return "Music"
-        elif category == "morceau":
-            return "Track"
-
-    def get_details(self) -> Dict[str]:
-        """Returns details
-
-        Returns
-        -------
-        Dict[str]
-            details
-        """
-
-        self.main_rating = self.get_main_rating()
-        self.rating_details = self.get_rating_details()
-        self.vote_count = self.get_vote_count()
-        self.favorite_count = self.get_favorite_count()
-        self.wishlist_count = self.get_wishlist_count()
-        self.in_progress_count = self.get_in_progress_count()
-        self.title = self.get_title()
-        self.year = self.get_year()
-        self.cover_url = self.get_cover_url()
-        self.review_count = self.get_review_count()
-        self.description = self.get_description()
-        return self.export()
-
-    def get_main_rating(self) -> Optional[str]:
-        """Returns main rating
-
-        Returns
-        -------
-        Optional[str]
-            main rating
-        """
-        try:
-            return self.soup.find("span", {"class": "pvi-scrating-value"}).text
-        except Exception as e:
-            logger.error("Function get_main_rating : %s.", e)
-            return None
-
-    def get_rating_details(self) -> Optional[Dict[int, int]]:
-        """Returns rating details
-
-        Returns
-        -------
-        Optional[Dict[int, int]]
-            rating details
-        """
-        try:
-            rating_details = {
-                key: int(value.text.strip())
-                for (key, value) in enumerate(
-                    self.soup.find("div", {"class": "pvi-scrating-graph"}).find_all("li", {"class": "elrg-graph-col"})[
-                        0:10
-                    ],
-                    1,
-                )
-            }
-            return rating_details
-        except Exception as e:
-            logger.error("Function get_rating_details : %s.", e)
-            return None
-
-    def get_vote_count(self) -> Optional[str]:
-        """Returns vote count
-
-        Returns
-        -------
-        Optional[str]
-            vote count
-        """
-        try:
-            return self.soup.find("meta", {"itemprop": "ratingCount"})["content"]
-        except Exception as e:
-            logger.error("Function get_vote_count : %s.", e)
-            return None
-
-    def get_favorite_count(self) -> Optional[str]:
-        """Returns favorite count
-
-        Returns
-        -------
-        Optional[str]
-            favorite count
-        """
-        try:
-            favorite_count = self.soup.find("li", {"title": "Coups de coeur"}).find("b").text
-            return format_number(favorite_count)
-        except Exception as e:
-            logger.error("Function get_favorite_count : %s.", e)
-            return None
-
-    def get_wishlist_count(self) -> Optional[str]:
-        try:
-            wishlist_count = self.soup.find("li", {"title": "Envies"}).find("b").text
-            return format_number(wishlist_count)
-        except Exception as e:
-            logger.error("Function get_wishlist_count : %s.", e)
-            return None
-
-    def get_in_progress_count(self) -> Optional[str]:
-        # Tracks and movies don't have in_progress_count.
-        if self.category in ["Track", "Movie"]:
-            return None
-        try:
-            in_progress_count = self.soup.find("li", {"title": "En cours"}).find("b").text
-            return format_number(in_progress_count)
-        except Exception as e:
-            logger.warning("Function get_in_progress_count : %s.", e)
-            return None
-
-    def get_title(self) -> Optional[str]:
-        try:
-            return self.soup.find("h1", {"class": "pvi-product-title"}).text.strip()
-        except Exception as e:
-            logger.error("Function get_title : %s.", e)
-            return None
-
-    def get_year(self) -> Optional[str]:
-        try:
-            return self.soup.find("small", {"class": "pvi-product-year"}).text.replace("(", "").replace(")", "")
-        except Exception as e:
-            logger.error("Function get_year : %s.", e)
-            return None
-
-    def get_cover_url(self) -> Optional[str]:
-        try:
-            return self.soup.find("img", {"class": "pvi-hero-poster"})["src"]
-        except Exception as e:
-            logger.error("Function get_cover_url : %s.", e)
-            return None
-
-    def get_review_count(self) -> Optional[str]:
-        try:
-            return self.soup.find("meta", {"itemprop": "reviewCount"})["content"]
-        except Exception as e:
-            logger.error("Function get_review_count : %s.", e)
-            return None
-
-    def get_description(self) -> Optional[str]:
-        # Tracks and albums don't have description.
-        if self.category in ["Track", "Album"]:
-            return None
-        try:
-            return (
-                self.soup.find("p", {"class": "pvi-productDetails-resume"})
-                # workaround to delete text from button
-                .text.replace("Lire la suite", "").strip()
-            )
-        except Exception as e:
-            logger.error("Function get_description : %s.", e)
-            return None
-
-    def get_complementary_info(self) -> Dict:
-        try:
-            complementary_info = [
-                i.text.replace("\n", "").replace("\t", "").strip()
-                for i in self.soup.find("section", {"class": "pvi-productDetails"}).find_all("li")
-            ]
-            creator = ", ".join(
-                [
-                    x.text.strip()
-                    for x in self.soup.find("section", {"class": "pvi-productDetails"})
-                    .find("li")
-                    .find_all("span", {"itemprop": "name"})
-                ]
-            )
-            if self.category == "Movie":
-                return {
-                    "Producer": creator,
-                    "Genre": complementary_info[1],
-                    "Length": complementary_info[2],
-                    "Release Date": complementary_info[3],
-                }
-            elif self.category == "Series":
-                return {
-                    "Producer": creator,
-                    "Genre": complementary_info[1],
-                    "Season Number": complementary_info[2],
-                    "Editor": complementary_info[3],
-                    "Episode Length": complementary_info[4],
-                    "Release Date": complementary_info[5],
-                }
-            elif self.category == "Video Game":
-                return {
-                    "Developer": creator,
-                    "Platforms": complementary_info[1],
-                    "Genre": complementary_info[2],
-                    "Release Date": complementary_info[3],
-                }
-            elif self.category == "Book":
-                return {
-                    "Writer": creator,
-                    "Genre": complementary_info[1],
-                    "Release Date": complementary_info[2],
-                }
-            elif self.category == "Comics":
-                return {
-                    "Writer": creator,
-                    "Release Date": complementary_info[1],
-                }
-            elif self.category == "Music":
-                return {
-                    "Artist": creator,
-                    "Genre": complementary_info[1],
-                    "Label": complementary_info[2],
-                    "Release Date": complementary_info[3],
-                }
-            elif self.category == "Track":
-                return {
-                    "Artist": creator,
-                    "Length": complementary_info[1],
-                    "Release Date": complementary_info[2],
-                }
-            else:
-                logger.warning(f"Category {self.category} not supported.")
-                return {}
-        except Exception as e:
-            logger.error("Function get_complementary_info : %s.", e)
-            return {}
+    return result

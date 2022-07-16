@@ -1,3 +1,4 @@
+"""Useful functions of music items"""
 import logging
 from typing import Dict, List
 
