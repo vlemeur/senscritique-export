@@ -86,7 +86,7 @@ def get_topchart(url: str) -> List[Dict]:
     Returns
     -------
     List[Dict]
-        List of dictionaries containing the topchart informations
+        List of dictionaries containing the topchart information
     """
 
     logger.info("URL : %s", url)
@@ -168,7 +168,7 @@ def get_survey(url: str) -> List[Dict]:
     Returns
     -------
     List[Dict]
-        survey informations
+        survey information
     """
 
     logger.info("URL : %s", url)
@@ -274,8 +274,7 @@ def get_work_details(url: str) -> Dict:
 def get_url(search_term: str, rank: int = 1, genre: Optional[str] = None) -> Optional[str]:
     """Return the first result URL for the search term.
     Rank can be changed (default 1: first result).
-    Genre can be changed (default None. Possible choices in ["Morceaux", "Albums",
-    "Films", "Livres", "Séries", "BD", "Jeux"])
+    Genre can be changed
 
     Parameters
     ----------
@@ -307,8 +306,7 @@ def get_url(search_term: str, rank: int = 1, genre: Optional[str] = None) -> Opt
 
 def get_url_closest_match(search_term: str, genre: Optional[str] = None) -> Optional[str]:
     """Return the result URL for the search term that is also the closest match to the search term.
-    Genre can be changed (default None. Possible choices in ["Morceaux", "Albums",
-    "Films", "Livres", "Séries", "BD", "Jeux"])
+    Genre can be changed
 
     Parameters
     ----------
