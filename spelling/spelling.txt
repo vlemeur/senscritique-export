@@ -322,9 +322,9 @@ resampler
 resampling
 
 # Senscritique related
-url
 URL
 plateform
 plateforms
 topchart
+url
 videogames

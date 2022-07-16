@@ -44,7 +44,7 @@ def get_order_series_columns() -> List:
     Returns
     -------
     List
-       order of columns for series rows
+       columns order for series rows
     """
     return [
         "Rank",
