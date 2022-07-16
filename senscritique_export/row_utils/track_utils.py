@@ -8,8 +8,8 @@ from . import row_utils
 logger = logging.getLogger(__name__)
 
 
-def get_track_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a track row.
+def get_track_info_from_row(row: element.Tag) -> Dict:
+    """Returns a dict containing info for a track row.
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ def get_track_infos_from_row(row: element.Tag) -> Dict:
     Returns
     -------
     Dict
-        track row infos
+        track row info
     """
     return {
         "Rank": row_utils.get_rank(row),

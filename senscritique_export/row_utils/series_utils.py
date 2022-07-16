@@ -8,8 +8,8 @@ from . import row_utils
 logger = logging.getLogger(__name__)
 
 
-def get_series_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a series row.
+def get_series_info_from_row(row: element.Tag) -> Dict:
+    """Returns a dict containing info for a series row.
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ def get_series_infos_from_row(row: element.Tag) -> Dict:
     Returns
     -------
     Dict
-        infos for a series row
+        info for a series row
     """
     return {
         "Rank": row_utils.get_rank(row),

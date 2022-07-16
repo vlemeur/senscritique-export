@@ -8,8 +8,8 @@ from . import row_utils
 logger = logging.getLogger(__name__)
 
 
-def get_videogames_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a videogame row.
+def get_videogames_info_from_row(row: element.Tag) -> Dict:
+    """Returns a dict containing info for a videogame row.
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ def get_videogames_infos_from_row(row: element.Tag) -> Dict:
     Returns
     -------
     Dict
-        videogame row infos
+        videogame row info
     """
     return {
         "Rank": row_utils.get_rank(row),
@@ -38,10 +38,10 @@ def get_videogames_infos_from_row(row: element.Tag) -> Dict:
     }
 
 
-def get_videogames_topchart_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a videogame row.
+def get_videogames_topchart_info_from_row(row: element.Tag) -> Dict:
+    """Returns a dict containing info for a videogame row.
 
-    Workaround to properly extract infos from a topchart.
+    Workaround to properly extract info from a topchart.
     Previously the platform function was compatible with both
     collection and topchart, but as of early February 2022 the format
     has changed between both.
@@ -54,7 +54,7 @@ def get_videogames_topchart_infos_from_row(row: element.Tag) -> Dict:
     Returns
     -------
     Dict
-        videogame row infos
+        videogame row info
     """
     return {
         "Rank": row_utils.get_rank(row),

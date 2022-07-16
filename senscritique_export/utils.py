@@ -6,16 +6,16 @@ from typing import Dict, List, Optional
 import requests
 from bs4 import BeautifulSoup, element
 
-from senscritique_export.row_utils.books_utils import get_books_infos_from_row, get_order_books_columns
-from senscritique_export.row_utils.comics_utils import get_comics_infos_from_row, get_order_comics_columns
-from senscritique_export.row_utils.movies_utils import get_movies_infos_from_row, get_order_movies_columns
-from senscritique_export.row_utils.music_utils import get_music_infos_from_row, get_order_music_columns
-from senscritique_export.row_utils.series_utils import get_order_series_columns, get_series_infos_from_row
-from senscritique_export.row_utils.track_utils import get_track_infos_from_row
+from senscritique_export.row_utils.books_utils import get_books_info_from_row, get_order_books_columns
+from senscritique_export.row_utils.comics_utils import get_comics_info_from_row, get_order_comics_columns
+from senscritique_export.row_utils.movies_utils import get_movies_info_from_row, get_order_movies_columns
+from senscritique_export.row_utils.music_utils import get_music_info_from_row, get_order_music_columns
+from senscritique_export.row_utils.series_utils import get_order_series_columns, get_series_info_from_row
+from senscritique_export.row_utils.track_utils import get_track_info_from_row
 from senscritique_export.row_utils.videogames_utils import (
     get_order_videogames_columns,
-    get_videogames_infos_from_row,
-    get_videogames_topchart_infos_from_row,
+    get_videogames_info_from_row,
+    get_videogames_topchart_info_from_row,
 )
 
 logger = logging.getLogger(__name__)
@@ -162,7 +162,7 @@ def get_rows_from_collection(soup: BeautifulSoup) -> List[element.ResultSet]:
     return list_rows
 
 
-def get_collection_infos(soup: BeautifulSoup) -> List[Dict]:
+def get_collection_info(soup: BeautifulSoup) -> List[Dict]:
     """Returns a list of dict containing an user collection information.
 
     Parameters
@@ -176,12 +176,12 @@ def get_collection_infos(soup: BeautifulSoup) -> List[Dict]:
         List of dict containing user collection information
     """
     rows = get_rows_from_collection(soup)
-    list_infos = []
+    list_info = []
     for row in rows:
-        info = get_row_infos(row)
+        info = get_row_info(row)
         if info:
-            list_infos.append(info)
-    return list_infos
+            list_info.append(info)
+    return list_info
 
 
 def get_category(row: element.Tag) -> str:
@@ -200,7 +200,7 @@ def get_category(row: element.Tag) -> str:
     return row.find("a", {"class": "elco-anchor"})["href"].split("/")[1]
 
 
-def get_row_infos(row: element.Tag) -> Optional[Dict]:
+def get_row_info(row: element.Tag) -> Optional[Dict]:
     """Returns a dict containing a row information.
 
     Parameters
@@ -213,48 +213,48 @@ def get_row_infos(row: element.Tag) -> Optional[Dict]:
     Optional[Dict]
         row information
     """
-    logger.debug("get_row_infos")
+    logger.debug("get_row_info")
     category = get_category(row)
     if category == "film":
         row_info = {
-            **get_movies_infos_from_row(row),
-            **get_complementary_infos_collection(row),
+            **get_movies_info_from_row(row),
+            **get_complementary_info_collection(row),
             **{"Category": "Movie"},
         }
     elif category == "serie":
         row_info = {
-            **get_series_infos_from_row(row),
-            **get_complementary_infos_collection(row),
+            **get_series_info_from_row(row),
+            **get_complementary_info_collection(row),
             **{"Category": "Series"},
         }
     elif category == "jeuvideo":
         row_info = {
-            **get_videogames_infos_from_row(row),
-            **get_complementary_infos_collection(row),
+            **get_videogames_info_from_row(row),
+            **get_complementary_info_collection(row),
             **{"Category": "Video Game"},
         }
     elif category == "livre":
         row_info = {
-            **get_books_infos_from_row(row),
-            **get_complementary_infos_collection(row),
+            **get_books_info_from_row(row),
+            **get_complementary_info_collection(row),
             **{"Category": "Book"},
         }
     elif category == "bd":
         row_info = {
-            **get_comics_infos_from_row(row),
-            **get_complementary_infos_collection(row),
+            **get_comics_info_from_row(row),
+            **get_complementary_info_collection(row),
             **{"Category": "Comics"},
         }
     elif category == "album":
         row_info = {
-            **get_music_infos_from_row(row),
-            **get_complementary_infos_collection(row),
+            **get_music_info_from_row(row),
+            **get_complementary_info_collection(row),
             **{"Category": "Music"},
         }
     elif category == "morceau":
         row_info = {
-            **get_track_infos_from_row(row),
-            **get_complementary_infos_collection(row),
+            **get_track_info_from_row(row),
+            **get_complementary_info_collection(row),
             **{"Category": "Track"},
         }
     else:
@@ -264,7 +264,7 @@ def get_row_infos(row: element.Tag) -> Optional[Dict]:
     return row_info
 
 
-def get_complementary_infos_collection(row: element.Tag) -> Dict:
+def get_complementary_info_collection(row: element.Tag) -> Dict:
     """Get information specific to a collection row.
 
     Parameters
@@ -281,19 +281,19 @@ def get_complementary_infos_collection(row: element.Tag) -> Dict:
         "span", {"class": "elrua-useraction-inner only-child"}
     )
 
-    dict_infos = {}
+    dict_info = {}
     if action.find("span", {"class": "eins-wish-list"}):
-        dict_infos["User Action"] = "Wishlisted"
+        dict_info["User Action"] = "Wishlisted"
     elif action.find("span", {"class": "eins-current"}):
-        dict_infos["User Action"] = "In Progress"
+        dict_info["User Action"] = "In Progress"
     else:
-        dict_infos["User Action"] = "Rated"
+        dict_info["User Action"] = "Rated"
 
-    dict_infos["Recommended"] = "True" if action.find("span", {"class": "eins-user-recommend"}) else "False"
+    dict_info["Recommended"] = "True" if action.find("span", {"class": "eins-user-recommend"}) else "False"
 
-    dict_infos["User Rating"] = action.text.strip()
-    logger.debug(dict_infos)
-    return dict_infos
+    dict_info["User Rating"] = action.text.strip()
+    logger.debug(dict_info)
+    return dict_info
 
 
 def get_list_work_current_page_number(soup: BeautifulSoup) -> Optional[int]:
@@ -384,7 +384,7 @@ def get_rows_from_list_work(soup: BeautifulSoup) -> List[element.ResultSet]:
     list_rows = []
     while True:
         for row in soup.find_all("li", {"class": "elpr-item"}):
-            list_rows.append(get_row_infos(row))
+            list_rows.append(get_row_info(row))
         soup = get_next_list_work_soup(soup)
         if not soup:
             logger.debug("No rows here. Either it is the last page, the url is not valid or the list_work is private.")
@@ -392,7 +392,7 @@ def get_rows_from_list_work(soup: BeautifulSoup) -> List[element.ResultSet]:
     return list_rows
 
 
-def get_list_work_infos(soup: BeautifulSoup) -> List[Dict]:
+def get_list_work_info(soup: BeautifulSoup) -> List[Dict]:
     """Returns a list of dict containing an user list_work information.
 
     Parameters
@@ -555,7 +555,7 @@ def get_category_from_survey(soup: BeautifulSoup) -> str:
     return soup.find("li", {"class": "header-navigation-universe-current"}).find("a")["href"].split("/")[-1]
 
 
-def get_survey_infos(soup: BeautifulSoup, category: str) -> List[Dict]:
+def get_survey_info(soup: BeautifulSoup, category: str) -> List[Dict]:
     """Returns a list of dict containing data of a survey.
 
     Parameters
@@ -572,21 +572,21 @@ def get_survey_infos(soup: BeautifulSoup, category: str) -> List[Dict]:
     """
     rows = get_rows_from_survey(soup)
     if category == "films":
-        list_infos = [get_movies_infos_from_row(x) for x in rows]
+        list_info = [get_movies_info_from_row(x) for x in rows]
     elif category == "series":
-        list_infos = [get_series_infos_from_row(x) for x in rows]
+        list_info = [get_series_info_from_row(x) for x in rows]
     elif category == "jeuxvideo":
-        list_infos = [get_videogames_infos_from_row(x) for x in rows]
+        list_info = [get_videogames_info_from_row(x) for x in rows]
     elif category == "livres":
-        list_infos = [get_books_infos_from_row(x) for x in rows]
+        list_info = [get_books_info_from_row(x) for x in rows]
     elif category == "bd":
-        list_infos = [get_comics_infos_from_row(x) for x in rows]
+        list_info = [get_comics_info_from_row(x) for x in rows]
     elif category == "musique":
-        list_infos = [get_music_infos_from_row(x) for x in rows]
+        list_info = [get_music_info_from_row(x) for x in rows]
     else:
         logger.error(f"Category {category} not supported.")
         return []
-    return list_infos
+    return list_info
 
 
 def get_survey_order(category: str) -> List:
@@ -635,7 +635,7 @@ def get_rows_from_topchart(soup: BeautifulSoup) -> List[element.ResultSet]:
     return soup.find("ol", {"class": "elto-list"}).find_all("li", {"class": "elto-item"})
 
 
-def get_topchart_infos(soup: BeautifulSoup, category: str) -> List[Dict]:
+def get_topchart_info(soup: BeautifulSoup, category: str) -> List[Dict]:
     """Returns a list of dict containing data of a topchart.
 
     Parameters
@@ -652,17 +652,17 @@ def get_topchart_infos(soup: BeautifulSoup, category: str) -> List[Dict]:
     """
     rows = get_rows_from_topchart(soup)
     if category == "films":
-        return [get_movies_infos_from_row(x) for x in rows]
+        return [get_movies_info_from_row(x) for x in rows]
     elif category == "series":
-        return [get_series_infos_from_row(x) for x in rows]
+        return [get_series_info_from_row(x) for x in rows]
     elif category == "jeuxvideo":
-        return [get_videogames_topchart_infos_from_row(x) for x in rows]
+        return [get_videogames_topchart_info_from_row(x) for x in rows]
     elif category == "livres":
-        return [get_books_infos_from_row(x) for x in rows]
+        return [get_books_info_from_row(x) for x in rows]
     elif category == "bd":
-        return [get_comics_infos_from_row(x) for x in rows]
+        return [get_comics_info_from_row(x) for x in rows]
     elif category == "musique":
-        return [get_music_infos_from_row(x) for x in rows]
+        return [get_music_info_from_row(x) for x in rows]
     else:
         logger.error(f"Category {category} not supported.")
         return []
@@ -727,7 +727,7 @@ class Work:
                 "In Progress Count": self.in_progress_count,
                 "Description": self.description,
             },
-            **self.get_complementary_infos(),
+            **self.get_complementary_info(),
             **{"Category": self.category},
         }
 
@@ -904,9 +904,9 @@ class Work:
             logger.error("Function get_description : %s.", e)
             return None
 
-    def get_complementary_infos(self) -> Dict:
+    def get_complementary_info(self) -> Dict:
         try:
-            complementary_infos = [
+            complementary_info = [
                 i.text.replace("\n", "").replace("\t", "").strip()
                 for i in self.soup.find("section", {"class": "pvi-productDetails"}).find_all("li")
             ]
@@ -921,53 +921,53 @@ class Work:
             if self.category == "Movie":
                 return {
                     "Producer": creator,
-                    "Genre": complementary_infos[1],
-                    "Length": complementary_infos[2],
-                    "Release Date": complementary_infos[3],
+                    "Genre": complementary_info[1],
+                    "Length": complementary_info[2],
+                    "Release Date": complementary_info[3],
                 }
             elif self.category == "Series":
                 return {
                     "Producer": creator,
-                    "Genre": complementary_infos[1],
-                    "Season Number": complementary_infos[2],
-                    "Editor": complementary_infos[3],
-                    "Episode Length": complementary_infos[4],
-                    "Release Date": complementary_infos[5],
+                    "Genre": complementary_info[1],
+                    "Season Number": complementary_info[2],
+                    "Editor": complementary_info[3],
+                    "Episode Length": complementary_info[4],
+                    "Release Date": complementary_info[5],
                 }
             elif self.category == "Video Game":
                 return {
                     "Developer": creator,
-                    "Platforms": complementary_infos[1],
-                    "Genre": complementary_infos[2],
-                    "Release Date": complementary_infos[3],
+                    "Platforms": complementary_info[1],
+                    "Genre": complementary_info[2],
+                    "Release Date": complementary_info[3],
                 }
             elif self.category == "Book":
                 return {
                     "Writer": creator,
-                    "Genre": complementary_infos[1],
-                    "Release Date": complementary_infos[2],
+                    "Genre": complementary_info[1],
+                    "Release Date": complementary_info[2],
                 }
             elif self.category == "Comics":
                 return {
                     "Writer": creator,
-                    "Release Date": complementary_infos[1],
+                    "Release Date": complementary_info[1],
                 }
             elif self.category == "Music":
                 return {
                     "Artist": creator,
-                    "Genre": complementary_infos[1],
-                    "Label": complementary_infos[2],
-                    "Release Date": complementary_infos[3],
+                    "Genre": complementary_info[1],
+                    "Label": complementary_info[2],
+                    "Release Date": complementary_info[3],
                 }
             elif self.category == "Track":
                 return {
                     "Artist": creator,
-                    "Length": complementary_infos[1],
-                    "Release Date": complementary_infos[2],
+                    "Length": complementary_info[1],
+                    "Release Date": complementary_info[2],
                 }
             else:
                 logger.warning(f"Category {self.category} not supported.")
                 return {}
         except Exception as e:
-            logger.error("Function get_complementary_infos : %s.", e)
+            logger.error("Function get_complementary_info : %s.", e)
             return {}

@@ -8,8 +8,8 @@ from . import row_utils
 logger = logging.getLogger(__name__)
 
 
-def get_comics_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a comics row.
+def get_comics_info_from_row(row: element.Tag) -> Dict:
+    """Returns a dict containing info for a comics row.
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ def get_comics_infos_from_row(row: element.Tag) -> Dict:
     Returns
     -------
     Dict
-        comics row infos
+        comics row info
     """
     return {
         "Rank": row_utils.get_rank(row),

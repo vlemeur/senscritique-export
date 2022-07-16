@@ -5,13 +5,13 @@ from senscritique_export.utils import (
     Work,
     get_category_from_survey,
     get_closest_search_result,
-    get_collection_infos,
-    get_list_work_infos,
+    get_collection_info,
+    get_list_work_info,
     get_search_result,
     get_search_url,
     get_soup,
-    get_survey_infos,
-    get_topchart_infos,
+    get_survey_info,
+    get_topchart_info,
 )
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ def get_user_collection(user: Optional[str] = None, url: Optional[str] = None) -
         logger.error(e)
         exit()
 
-    collection = get_collection_infos(soup)
+    collection = get_collection_info(soup)
     return collection
 
 
@@ -97,7 +97,7 @@ def get_topchart(url: str) -> List[Dict]:
         exit()
 
     category = get_category_from_topchart_url(url)
-    topchart = get_topchart_infos(soup, category)
+    topchart = get_topchart_info(soup, category)
     return topchart
 
 
@@ -179,7 +179,7 @@ def get_survey(url: str) -> List[Dict]:
         exit()
 
     category = get_category_from_survey(soup)
-    survey = get_survey_infos(soup, category)
+    survey = get_survey_info(soup, category)
     return survey
 
 
@@ -228,7 +228,7 @@ def get_list_work(url: str) -> List[Dict]:
         logger.error(e)
         exit()
 
-    list_work = get_list_work_infos(soup)
+    list_work = get_list_work_info(soup)
     return list_work
 
 

@@ -8,8 +8,8 @@ from . import row_utils
 logger = logging.getLogger(__name__)
 
 
-def get_books_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a book row.
+def get_books_info_from_row(row: element.Tag) -> Dict:
+    """Returns a dict containing info for a book row.
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ def get_books_infos_from_row(row: element.Tag) -> Dict:
     Returns
     -------
     Dict
-        book row infos
+        book row info
     """
     return {
         "Rank": row_utils.get_rank(row),
