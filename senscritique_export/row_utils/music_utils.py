@@ -1,0 +1,60 @@
+"""Useful functions of music items"""
+import logging
+from typing import Dict, List
+
+from bs4 import element
+
+from . import row_utils
+
+logger = logging.getLogger(__name__)
+
+
+def get_music_info_from_row(row: element.Tag) -> Dict:
+    """Returns a dict containing info for a music row.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Dict
+        music row info
+    """
+    return {
+        "Rank": row_utils.get_rank(row),
+        "Title": row_utils.get_title(row),
+        "URL": row_utils.get_url(row),
+        "Year": row_utils.get_year(row),
+        "Release Date": row_utils.get_baseline_0(row),
+        "Genre": row_utils.get_baseline_1(row),
+        "Number of Songs": row_utils.get_number_of_seasons(row),
+        "Picture URL": row_utils.get_picture_url(row),
+        "Artist": row_utils.get_producer(row),
+        "Average Rating": row_utils.get_average_rating(row),
+        "Number of Ratings": row_utils.get_number_of_ratings(row),
+    }
+
+
+def get_order_music_columns() -> List:
+    """Returns the order of columns for music rows.
+
+    Returns
+    -------
+    List
+        order columns for music rows
+    """
+    return [
+        "Rank",
+        "Title",
+        "Average Rating",
+        "Number of Ratings",
+        "URL",
+        "Year",
+        "Release Date",
+        "Genre",
+        "Number of Songs",
+        "Picture URL",
+        "Artist",
+    ]
