@@ -41,7 +41,7 @@ def get_baseline_0(row: element.Tag) -> Optional[str]:
         first element of baseline
     """
     try:
-        return parse_baseline(row)[0].strip()
+        return parse_baseline(row)[0].strip()  # type: ignore
     except Exception as exception:
         logger.debug("Function get_baseline_0 for row %s : %s", row, exception)
         return None
@@ -61,7 +61,7 @@ def get_baseline_1(row: element.Tag) -> Optional[str]:
         second element of baseline
     """
     try:
-        return parse_baseline(row)[1].strip()
+        return parse_baseline(row)[1].strip()  # type: ignore
     except Exception as exception:
         logger.debug("Function get_baseline_1 for row %s : %s", row, exception)
         return None
@@ -81,7 +81,7 @@ def get_baseline_2(row: element.Tag) -> Optional[str]:
         third element of baseline
     """
     try:
-        return parse_baseline(row)[2].strip()
+        return parse_baseline(row)[2].strip()  # type: ignore
     except Exception as exception:
         logger.debug("Function get_baseline_2 for row %s : %s", row, exception)
         return None
@@ -238,9 +238,9 @@ def get_genre(row: element.Tag) -> Optional[str]:
     """
     try:
         if not get_number_of_seasons(row):
-            genre = parse_baseline(row)[2].strip()
+            genre = parse_baseline(row)[2].strip()  # type: ignore
         else:
-            genre = parse_baseline(row)[3].strip()
+            genre = parse_baseline(row)[3].strip()  # type: ignore
     except Exception as exception:
         logger.debug("Function get_genre for row %s : %s", row, exception)
         genre = None
@@ -348,7 +348,7 @@ def get_number_of_seasons(row: element.Tag) -> Optional[str]:
         number of seasons of a row
     """
     try:
-        number_of_seasons = parse_baseline(row)[2].strip()
+        number_of_seasons = parse_baseline(row)[2].strip()  # type: ignore
         if not any(i.isdigit() for i in number_of_seasons):
             return None
     except Exception as exception:

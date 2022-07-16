@@ -435,7 +435,7 @@ def sanitize_text(text: str) -> str:
     str
         sanitized text
     """
-    return urllib.parse.quote_plus(text)
+    return urllib.parse.quote_plus(text)  # type: ignore
 
 
 def get_search_url(search_term: str, genre: Optional[str] = None) -> str:

@@ -17,12 +17,12 @@ class Work:  # pylint: disable=too-many-instance-attributes
         self.category = self.get_category()
         self.soup = get_soup(self.url)
 
-    def export(self) -> Dict[str]:
+    def export(self) -> Dict[str, Optional[str]]:
         """Export information
 
         Returns
         -------
-        Dict[str]
+        Dict[str, Optional[str]]
             information
         """
         return {
@@ -30,7 +30,7 @@ class Work:  # pylint: disable=too-many-instance-attributes
                 "Title": self.title,
                 "URL": self.url,
                 "Rating": self.main_rating,
-                "Rating Details": self.rating_details,
+                "Rating Details": self.rating_details,  # type: ignore
                 "Year": self.year,
                 "Cover URL": self.cover_url,
                 "Review Count": self.review_count,
@@ -69,12 +69,12 @@ class Work:  # pylint: disable=too-many-instance-attributes
             result = "Track"
         return result
 
-    def get_details(self) -> Dict[str]:
+    def get_details(self) -> Dict[str, Optional[str]]:
         """Returns details
 
         Returns
         -------
-        Dict[str]
+        Dict[str, Optional[str]]
             details
         """
 
