@@ -19,10 +19,22 @@ from senscritique_export.row_utils.videogames_utils import (
 )
 
 logger = logging.getLogger(__name__)
+GENRE_CHOICES = ["Morceaux", "Albums", "Films", "Livres", "Séries", "BD", "Jeux"]
 
 
 def get_soup(url: str) -> BeautifulSoup:
-    """Returns a BeautifulSoup object for an url."""
+    """Returns a BeautifulSoup object for an url.
+
+    Parameters
+    ----------
+    url : str
+        url to consider
+
+    Returns
+    -------
+    BeautifulSoup
+        BeautifulSoup object built from url
+    """
     return BeautifulSoup(requests.get(url).content, "lxml")
 
 
@@ -36,7 +48,18 @@ def format_number(number: str) -> str:
 
 
 def get_collection_current_page_number(soup: BeautifulSoup) -> Optional[int]:
-    """Returns the senscritique page number of a BeautifulSoup object."""
+    """Returns the senscritique page number of a BeautifulSoup object.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        BeautifulSoup object
+
+    Returns
+    -------
+    Optional[int]
+        page number
+    """
     try:
         page_number = int(soup.find("span", {"class": "eipa-current"}).text)
         logger.info("Current collection page number : %s", page_number)
@@ -47,7 +70,18 @@ def get_collection_current_page_number(soup: BeautifulSoup) -> Optional[int]:
 
 
 def get_dict_available_pages(soup: BeautifulSoup) -> Dict[int, str]:
-    """Returns a dict of the available pages in a BeautifulSoup object."""
+    """Returns a dict of the available pages in a BeautifulSoup object.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    Dict[int, str]
+        available pages
+    """
     dict_links = {
         int(x["data-sc-pager-page"]): "https://old.senscritique.com" + x["href"]
         for x in soup.find_all("a", {"class": "eipa-anchor"})
@@ -56,7 +90,18 @@ def get_dict_available_pages(soup: BeautifulSoup) -> Dict[int, str]:
 
 
 def get_next_collection_link(soup: BeautifulSoup) -> Optional[str]:
-    """Returns the next link of BeautifulSoup object."""
+    """Returns the next link of BeautifulSoup object.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    Optional[str]
+        Next link
+    """
     available_pages = get_dict_available_pages(soup)
     current_page = get_collection_current_page_number(soup)
     if current_page:
@@ -66,7 +111,18 @@ def get_next_collection_link(soup: BeautifulSoup) -> Optional[str]:
 
 
 def get_next_collection_soup(soup: BeautifulSoup) -> BeautifulSoup:
-    """Returns the next BeautifulSoup object for an user collection."""
+    """Returns the next BeautifulSoup object for an user collection.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    BeautifulSoup
+        next BeautifulSoup for an user collection
+    """
     next_col = get_next_collection_link(soup)
     logger.debug("Next collection link : %s", next_col)
     if next_col:
@@ -81,7 +137,18 @@ def get_next_collection_soup(soup: BeautifulSoup) -> BeautifulSoup:
 
 
 def get_rows_from_collection(soup: BeautifulSoup) -> List[element.ResultSet]:
-    """Returns a list of rows from a collection."""
+    """Returns a list of rows from a collection.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    List[element.ResultSet]
+        List of rows from a collection
+    """
     logger.debug("get_rows_from_collection")
     list_rows = []
     while True:
@@ -96,7 +163,18 @@ def get_rows_from_collection(soup: BeautifulSoup) -> List[element.ResultSet]:
 
 
 def get_collection_infos(soup: BeautifulSoup) -> List[Dict]:
-    """Returns a list of dict containing an user collection information."""
+    """Returns a list of dict containing an user collection information.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    List[Dict]
+        List of dict containing user collection information
+    """
     rows = get_rows_from_collection(soup)
     list_infos = []
     for row in rows:
@@ -106,17 +184,35 @@ def get_collection_infos(soup: BeautifulSoup) -> List[Dict]:
     return list_infos
 
 
-def get_collection_order():
-    """Returns the order of columns for a collection (not implemented yet)."""
-    return None
-
-
 def get_category(row: element.Tag) -> str:
+    """Returns a category from a row
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    str
+        category
+    """
     return row.find("a", {"class": "elco-anchor"})["href"].split("/")[1]
 
 
 def get_row_infos(row: element.Tag) -> Optional[Dict]:
-    """Returns a dict containing a row information."""
+    """Returns a dict containing a row information.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Optional[Dict]
+        row information
+    """
     logger.debug("get_row_infos")
     category = get_category(row)
     if category == "film":
@@ -164,13 +260,23 @@ def get_row_infos(row: element.Tag) -> Optional[Dict]:
     else:
         logger.error(f"Category {category} not supported.")
         return None
-    # row_info.pop("Description", None)
-    # row_info.pop("Rank", None)
+
     return row_info
 
 
 def get_complementary_infos_collection(row: element.Tag) -> Dict:
-    """Get information specific to a collection row."""
+    """Get information specific to a collection row.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Dict
+        information from a c collection row
+    """
     action = row.find("div", {"class": "elco-collection-rating user"}).find(
         "span", {"class": "elrua-useraction-inner only-child"}
     )
@@ -191,7 +297,18 @@ def get_complementary_infos_collection(row: element.Tag) -> Dict:
 
 
 def get_list_work_current_page_number(soup: BeautifulSoup) -> Optional[int]:
-    """Returns the senscritique page number of a BeautifulSoup object."""
+    """Returns the senscritique page number of a BeautifulSoup object
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    Optional[int]
+        senscritique page number
+    """
     try:
         page_number = int(soup.find("span", {"class": "eipa-current"}).text)
         logger.info("Current list_work page number : %s", page_number)
@@ -201,17 +318,19 @@ def get_list_work_current_page_number(soup: BeautifulSoup) -> Optional[int]:
         return None
 
 
-def get_dict_available_pages(soup: BeautifulSoup) -> Dict[int, str]:
-    """Returns a dict of the available pages in a BeautifulSoup object."""
-    dict_links = {
-        int(x["data-sc-pager-page"]): "https://old.senscritique.com" + x["href"]
-        for x in soup.find_all("a", {"class": "eipa-anchor"})
-    }
-    return dict_links
-
-
 def get_next_list_work_link(soup: BeautifulSoup) -> Optional[str]:
-    """Returns the next link of BeautifulSoup object."""
+    """Returns the next link of BeautifulSoup object.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    Optional[str]
+        Next link of BeautifulSoup
+    """
     available_pages = get_dict_available_pages(soup)
     logger.debug("Available pages : %s.", available_pages)
     current_page = get_list_work_current_page_number(soup)
@@ -222,7 +341,18 @@ def get_next_list_work_link(soup: BeautifulSoup) -> Optional[str]:
 
 
 def get_next_list_work_soup(soup: BeautifulSoup) -> BeautifulSoup:
-    """Returns the next BeautifulSoup object for an user list_work."""
+    """Returns the next BeautifulSoup object for an user list_work.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    BeautifulSoup
+        Next BeautifulSoup for an user list
+    """
     next_col = get_next_list_work_link(soup)
     soup.decompose()
     logger.debug("Next list_work link : %s", next_col)
@@ -238,7 +368,18 @@ def get_next_list_work_soup(soup: BeautifulSoup) -> BeautifulSoup:
 
 
 def get_rows_from_list_work(soup: BeautifulSoup) -> List[element.ResultSet]:
-    """Returns a list of rows from a list_work."""
+    """Returns rows from list work
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    List[element.ResultSet]
+        rows from list work
+    """
     logger.debug("get_rows_from_list_work")
     list_rows = []
     while True:
@@ -252,78 +393,53 @@ def get_rows_from_list_work(soup: BeautifulSoup) -> List[element.ResultSet]:
 
 
 def get_list_work_infos(soup: BeautifulSoup) -> List[Dict]:
-    """Returns a list of dict containing an user list_work information."""
+    """Returns a list of dict containing an user list_work information.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    List[Dict]
+        user list work information
+    """
     rows = get_rows_from_list_work(soup)
     return rows
 
 
-def get_list_work_order():
-    """Returns the order of columns for a list_work (not implemented yet)."""
-    return None
-
-
-def get_category(row: element.Tag) -> str:
-    return row.find("a", {"class": "elco-anchor"})["href"].split("/")[1]
-
-
-def get_row_infos(row: element.Tag) -> Optional[Dict]:
-    """Returns a dict containing a row information."""
-    logger.debug("get_row_infos")
-    category = get_category(row)
-    if category == "film":
-        logger.debug("films")
-        row_info = {
-            **get_movies_infos_from_row(row),
-            **{"Category": "Movie"},
-        }
-    elif category == "serie":
-        logger.debug("series")
-        row_info = {
-            **get_series_infos_from_row(row),
-            **{"Category": "Series"},
-        }
-    elif category == "jeuvideo":
-        logger.debug("jeuxvideo")
-        row_info = {
-            **get_videogames_infos_from_row(row),
-            **{"Category": "Video Game"},
-        }
-    elif category == "livre":
-        logger.debug("livres")
-        row_info = {
-            **get_books_infos_from_row(row),
-            **{"Category": "Book"},
-        }
-    elif category == "bd":
-        logger.debug("bd")
-        row_info = {
-            **get_comics_infos_from_row(row),
-            **{"Category": "Comics"},
-        }
-    elif category == "album":
-        logger.debug("musique")
-        row_info = {
-            **get_music_infos_from_row(row),
-            **{"Category": "Music"},
-        }
-    else:
-        logger.error(f"Error: unsupported category {category}. Skipping.")
-        return None
-    row_info.pop("Description", None)
-    row_info.pop("Rank", None)
-    return row_info
-
-
-GENRE_CHOICES = ["Morceaux", "Albums", "Films", "Livres", "Séries", "BD", "Jeux"]
-
-
 def sanitize_text(text: str) -> str:
-    """Sanitize text to URL-compatible text."""
+    """Sanitize text to URL-compatible text.
+
+    Parameters
+    ----------
+    text : str
+        text to sanitize
+
+    Returns
+    -------
+    str
+        sanitized text
+    """
     return urllib.parse.quote_plus(text)
 
 
-def get_search_url(search_term: str, genre: str = None) -> str:
-    """Returns the senscritique search URL for a search term."""
+def get_search_url(search_term: str, genre: Optional[str] = None) -> str:
+    """Returns the senscritique search URL for a search term.
+
+    Parameters
+    ----------
+    search_term : str
+        search term
+    genre : Optional[str]
+        genre , by default None
+
+    Returns
+    -------
+    str
+        search url
+    """
     search_term_sanitized = sanitize_text(search_term)
     if genre not in GENRE_CHOICES:
         url = f"https://old.senscritique.com/search?q={search_term_sanitized}"
@@ -333,7 +449,20 @@ def get_search_url(search_term: str, genre: str = None) -> str:
 
 
 def get_search_result(soup: BeautifulSoup, position: int) -> Optional[str]:
-    """Returns the URL result of the BeautifulSoup object at the defined position."""
+    """Returns the URL result of the BeautifulSoup object at the defined position.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+    position : int
+        position
+
+    Returns
+    -------
+    Optional[str]
+        URL result
+    """
     try:
         url_list = [
             x.find_all("a")[1]["href"]
@@ -341,7 +470,8 @@ def get_search_result(soup: BeautifulSoup, position: int) -> Optional[str]:
         ]
         if position > len(url_list):
             logger.error(
-                f"Desired result not found in search results (Desired result: position {position}, number of search results: {len(url_list)})."
+                f"Desired result not found in search results"
+                f"(Desired result: position {position}, number of search results: {len(url_list)})."
             )
             return None
         return url_list[position - 1]
@@ -351,7 +481,25 @@ def get_search_result(soup: BeautifulSoup, position: int) -> Optional[str]:
 
 
 def get_closest_search_result(soup: BeautifulSoup, search_term: str) -> Optional[str]:
-    """Returns the closest result of the results for the search_term."""
+    """Returns the closest result of the results for the search_term.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+    search_term : str
+        search term
+
+    Returns
+    -------
+    Optional[str]
+        closest result of the search term results
+
+    Raises
+    ------
+    Exception
+        an exception is raised if operation failed
+    """
     try:
         list_candidates = []
         for url in [
@@ -376,16 +524,52 @@ def get_closest_search_result(soup: BeautifulSoup, search_term: str) -> Optional
 
 
 def get_rows_from_survey(soup: BeautifulSoup) -> List[element.ResultSet]:
-    """Returns a list of rows from a survey."""
+    """Returns a list of rows from a survey.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    List[element.ResultSet]
+        list of survey rows
+    """
     return soup.find("ol", {"class": "pvi-list"}).find_all("li", {"class": "elpo-item"})
 
 
 def get_category_from_survey(soup: BeautifulSoup) -> str:
+    """Returns category from survey
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    str
+        category
+    """
     return soup.find("li", {"class": "header-navigation-universe-current"}).find("a")["href"].split("/")[-1]
 
 
 def get_survey_infos(soup: BeautifulSoup, category: str) -> List[Dict]:
-    """Returns a list of dict containing data of a survey."""
+    """Returns a list of dict containing data of a survey.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+    category : str
+        category to consider
+
+    Returns
+    -------
+    List[Dict]
+        data of a survey
+    """
     rows = get_rows_from_survey(soup)
     if category == "films":
         list_infos = [get_movies_infos_from_row(x) for x in rows]
@@ -406,7 +590,18 @@ def get_survey_infos(soup: BeautifulSoup, category: str) -> List[Dict]:
 
 
 def get_survey_order(category: str) -> List:
-    """Returns the order of columns for a survey based on its category."""
+    """Returns the order of columns for a survey based on its category.
+
+    Parameters
+    ----------
+    category : str
+        category
+
+    Returns
+    -------
+    List
+        order of columns
+    """
     if category == "films":
         return get_order_movies_columns()
     elif category == "series":
@@ -425,12 +620,36 @@ def get_survey_order(category: str) -> List:
 
 
 def get_rows_from_topchart(soup: BeautifulSoup) -> List[element.ResultSet]:
-    """Returns a list of rows from a topchart."""
+    """Returns a list of rows from a topchart.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+
+    Returns
+    -------
+    List[element.ResultSet]
+        list of topchart rows
+    """
     return soup.find("ol", {"class": "elto-list"}).find_all("li", {"class": "elto-item"})
 
 
 def get_topchart_infos(soup: BeautifulSoup, category: str) -> List[Dict]:
-    """Returns a list of dict containing data of a topchart."""
+    """Returns a list of dict containing data of a topchart.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        senscritique BeautifulSoup object
+    category : str
+        category to consider
+
+    Returns
+    -------
+    List[Dict]
+        data of a topchart
+    """
     rows = get_rows_from_topchart(soup)
     if category == "films":
         return [get_movies_infos_from_row(x) for x in rows]
@@ -450,7 +669,18 @@ def get_topchart_infos(soup: BeautifulSoup, category: str) -> List[Dict]:
 
 
 def get_topchart_order(category: str) -> List:
-    """Returns the order of columns for a topchart based on its category."""
+    """Returns the order of columns for a topchart based on its category.
+
+    Parameters
+    ----------
+    category : str
+        category to consider
+
+    Returns
+    -------
+    List
+        topchart order columns
+    """
     if category == "films":
         return get_order_movies_columns()
     elif category == "series":
@@ -474,7 +704,14 @@ class Work:
         self.category = self.get_category()
         self.soup = get_soup(self.url)
 
-    def export(self):
+    def export(self) -> Dict[str]:
+        """Export information
+
+        Returns
+        -------
+        Dict[str]
+            information
+        """
         return {
             **{
                 "Title": self.title,
@@ -494,7 +731,14 @@ class Work:
             **{"Category": self.category},
         }
 
-    def get_category(self):
+    def get_category(self) -> str:
+        """Returns a category
+
+        Returns
+        -------
+        str
+            category
+        """
         category = self.url.split("/")[3]
         if category == "film":
             return "Movie"
@@ -511,7 +755,15 @@ class Work:
         elif category == "morceau":
             return "Track"
 
-    def get_details(self):
+    def get_details(self) -> Dict[str]:
+        """Returns details
+
+        Returns
+        -------
+        Dict[str]
+            details
+        """
+
         self.main_rating = self.get_main_rating()
         self.rating_details = self.get_rating_details()
         self.vote_count = self.get_vote_count()
@@ -526,6 +778,13 @@ class Work:
         return self.export()
 
     def get_main_rating(self) -> Optional[str]:
+        """Returns main rating
+
+        Returns
+        -------
+        Optional[str]
+            main rating
+        """
         try:
             return self.soup.find("span", {"class": "pvi-scrating-value"}).text
         except Exception as e:
@@ -533,6 +792,13 @@ class Work:
             return None
 
     def get_rating_details(self) -> Optional[Dict[int, int]]:
+        """Returns rating details
+
+        Returns
+        -------
+        Optional[Dict[int, int]]
+            rating details
+        """
         try:
             rating_details = {
                 key: int(value.text.strip())
@@ -549,6 +815,13 @@ class Work:
             return None
 
     def get_vote_count(self) -> Optional[str]:
+        """Returns vote count
+
+        Returns
+        -------
+        Optional[str]
+            vote count
+        """
         try:
             return self.soup.find("meta", {"itemprop": "ratingCount"})["content"]
         except Exception as e:
@@ -556,6 +829,13 @@ class Work:
             return None
 
     def get_favorite_count(self) -> Optional[str]:
+        """Returns favorite count
+
+        Returns
+        -------
+        Optional[str]
+            favorite count
+        """
         try:
             favorite_count = self.soup.find("li", {"title": "Coups de coeur"}).find("b").text
             return format_number(favorite_count)

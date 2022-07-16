@@ -17,16 +17,25 @@ from senscritique_export.utils import (
 logger = logging.getLogger(__name__)
 
 
-def get_user_collection(user: str = None, url: str = None) -> List[Dict]:
+def get_user_collection(user: Optional[str] = None, url: Optional[str] = None) -> List[Dict]:
     """Export an user collection in a list of dictionaries.
 
-    Parameters:
-        user (str): Username (default is None).
-        url (str): Url of the profile page of the user (default is None).
+    Parameters
+    ----------
+    user :  Optional[str]
+        Username, by default None
+    url :  Optional[str]
+        Url of the profile page of the user, by default None
 
-    Returns:
-        collection: List of dictionaries containing the user collection.
+    Returns
+    -------
+    List[Dict]
+        user collection
 
+    Raises
+    ------
+    Exception
+        raised if get soup method failed
     """
 
     if user:
@@ -45,7 +54,20 @@ def get_user_collection(user: str = None, url: str = None) -> List[Dict]:
 
 
 def create_collection_filename(user: str, ext: str = "csv") -> str:
-    """Return a filename for a collection."""
+    """Return a filename for a collection.
+
+    Parameters
+    ----------
+    user : str
+        user to consider
+    ext : str
+        extension used, by default "csv"
+
+    Returns
+    -------
+    str
+        collection filename
+    """
     return f"export_collection_{user}.{ext}"
 
 
@@ -56,12 +78,15 @@ def get_topchart(url: str) -> List[Dict]:
     A topchart is an automatically generated ranking (i.e. Top 111 Films),
     a survey is filled in by the community (i.e. Best Movies for 2013).
 
-    Parameters:
-        url (str): Url of the senscritique topchart.
+    Parameters
+    ----------
+    url : str
+        Url of the senscritique topchart
 
-    Returns:
-        topchart: List of dictionaries containing the topchart informations.
-
+    Returns
+    -------
+    List[Dict]
+        List of dictionaries containing the topchart informations
     """
 
     logger.info("URL : %s", url)
@@ -79,7 +104,20 @@ def get_topchart(url: str) -> List[Dict]:
 def get_category_from_topchart_url(url: str) -> str:
     """Return the category from an url.
 
-    Throws an error if the url isn't recognized.
+    Parameters
+    ----------
+    url : str
+        url to consider
+
+    Returns
+    -------
+    str
+        category
+
+    Raises
+    ------
+    Exception
+        Throws an error if the url isn't recognized.
     """
 
     category = url.split("/")[3]
@@ -97,7 +135,20 @@ def get_category_from_topchart_url(url: str) -> str:
 
 
 def create_topchart_filename(url: str, ext: str = "csv") -> str:
-    """Return a filename for a topchart."""
+    """Return a filename for a topchart.
+
+    Parameters
+    ----------
+    url : str
+        url to topchart
+    ext : str
+        extension, by default "csv"
+
+    Returns
+    -------
+    str
+        topchart filename
+    """
     category = get_category_from_topchart_url(url)
     return f"export_topchart_{category}_{url.split('/')[-1]}.{ext}"
 
@@ -109,12 +160,15 @@ def get_survey(url: str) -> List[Dict]:
     A topchart is an automatically generated ranking (i.e. Top 111 Films),
     a survey is filled in by the community (i.e. Best Movies for 2013).
 
-    Parameters:
-        url (str): Url of the senscritique topchart.
+    Parameters
+    ----------
+    url : str
+        url of the senscritique topchart.
 
-    Returns:
-        survey: List of dictionaries containing the survey informations.
-
+    Returns
+    -------
+    List[Dict]
+        survey informations
     """
 
     logger.info("URL : %s", url)
@@ -130,14 +184,29 @@ def get_survey(url: str) -> List[Dict]:
 
 
 def create_survey_filename(url: str, ext: str = "csv") -> str:
-    """Return a filename for a survey."""
+    """Return a filename for a survey.
+
+    Parameters
+    ----------
+    url : str
+        url of survey
+    ext : str
+        extension, by default "csv"
+
+    Returns
+    -------
+    str
+        filename for a survey
+    """
     return f"export_survey_{url.split('/')[-1]}.{ext}"
 
 
 def get_list_work(url: str) -> List[Dict]:
     """Export a list of work from its url in a list of dictionaries.
 
-    Parameters:
+    Parameters
+    ----------
+    url : str
         url (str): Url (example : https://old.senscritique.com/films/oeuvres)
         Available urls : - https://old.senscritique.com/films/oeuvres
                          - https://old.senscritique.com/series/oeuvres
@@ -146,8 +215,10 @@ def get_list_work(url: str) -> List[Dict]:
                          - https://old.senscritique.com/jeuxvideo/oeuvres
                          - https://old.senscritique.com/musique/oeuvres
 
-    Returns:
-        List of dictionaries containing the work informations.
+    Returns
+    -------
+    List[Dict]
+        list of work object
     """
 
     logger.info("URL : %s", url)
@@ -162,7 +233,20 @@ def get_list_work(url: str) -> List[Dict]:
 
 
 def create_list_work_filename(url: str, ext: str = "csv") -> str:
-    """Return a filename for a list of work."""
+    """Return a filename for a list of work.
+
+    Parameters
+    ----------
+    url : str
+        url to consider
+    ext : str
+        extension, by default "csv"
+
+    Returns
+    -------
+    str
+        filename for a list of work
+    """
     category = get_category_from_topchart_url(url)
     return f"export_listwork_{category}_{url.split('/')[-1]}.{ext}"
 
@@ -170,7 +254,14 @@ def create_list_work_filename(url: str, ext: str = "csv") -> str:
 def get_work_details(url: str) -> Dict:
     """Extract details about a work regardless of its category.
 
-    Returns:
+    Parameters
+    ----------
+    url : str
+        url to consider
+
+    Returns
+    -------
+    Dict
         Dictionary containing the work details.
     """
 
@@ -180,14 +271,25 @@ def get_work_details(url: str) -> Dict:
     return work.get_details()
 
 
-def get_url(search_term: str, rank: int = 1, genre: str = None) -> Optional[str]:
+def get_url(search_term: str, rank: int = 1, genre: Optional[str] = None) -> Optional[str]:
     """Return the first result URL for the search term.
     Rank can be changed (default 1: first result).
     Genre can be changed (default None. Possible choices in ["Morceaux", "Albums",
     "Films", "Livres", "Séries", "BD", "Jeux"])
 
-    Returns:
-        URL of the first result.
+    Parameters
+    ----------
+    search_term : str
+        search term
+    rank : int
+        rank of page, by default 1
+    genre : Optional[str]
+        genre to consider, by default None
+
+    Returns
+    -------
+    Optional[str]
+        first URL result of search
     """
 
     logger.info("Search term: %s", search_term)
@@ -200,16 +302,30 @@ def get_url(search_term: str, rank: int = 1, genre: str = None) -> Optional[str]
         logger.error(e)
         exit()
 
-    return get_search_result(soup, 1)
+    return get_search_result(soup, rank)
 
 
-def get_url_closest_match(search_term: str, genre: str = None) -> Optional[str]:
+def get_url_closest_match(search_term: str, genre: Optional[str] = None) -> Optional[str]:
     """Return the result URL for the search term that is also the closest match to the search term.
     Genre can be changed (default None. Possible choices in ["Morceaux", "Albums",
     "Films", "Livres", "Séries", "BD", "Jeux"])
 
-    Returns:
-        URL of the first result.
+    Parameters
+    ----------
+    search_term : str
+        search term to consider
+    genre : Optional[str]
+        genre to consider, by default None
+
+    Returns
+    -------
+    Optional[str]
+        closest result for the search term results
+
+    Raises
+    ------
+    Exception
+        exception is raised if get soup failed
     """
 
     logger.info("Search term: %s", search_term)

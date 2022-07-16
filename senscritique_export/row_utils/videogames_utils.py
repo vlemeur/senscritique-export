@@ -9,7 +9,18 @@ logger = logging.getLogger(__name__)
 
 
 def get_videogames_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a videogame row."""
+    """Returns a dict containing infos for a videogame row.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Dict
+        videogame row infos
+    """
     return {
         "Rank": row_utils.get_rank(row),
         "Title": row_utils.get_title(row),
@@ -34,6 +45,16 @@ def get_videogames_topchart_infos_from_row(row: element.Tag) -> Dict:
     Previously the platform function was compatible with both
     collection and topchart, but as of early February 2022 the format
     has changed between both.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Dict
+        videogame row infos
     """
     return {
         "Rank": row_utils.get_rank(row),
@@ -53,7 +74,13 @@ def get_videogames_topchart_infos_from_row(row: element.Tag) -> Dict:
 
 
 def get_order_videogames_columns() -> List:
-    """Returns the order of columns for videogames rows."""
+    """Returns the order of columns for videogames rows.
+
+    Returns
+    -------
+    List
+       videogames order column
+    """
     return [
         "Rank",
         "Title",

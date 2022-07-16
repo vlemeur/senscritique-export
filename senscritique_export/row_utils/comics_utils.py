@@ -9,7 +9,18 @@ logger = logging.getLogger(__name__)
 
 
 def get_comics_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a comics row."""
+    """Returns a dict containing infos for a comics row.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Dict
+        comics row infos
+    """
     return {
         "Rank": row_utils.get_rank(row),
         "Title": row_utils.get_title(row),
@@ -26,7 +37,13 @@ def get_comics_infos_from_row(row: element.Tag) -> Dict:
 
 
 def get_order_comics_columns() -> List:
-    """Returns the order of columns for comics rows."""
+    """Returns the order of columns for comics rows.
+
+    Returns
+    -------
+    List
+       comic row columns order
+    """
     return [
         "Rank",
         "Title",

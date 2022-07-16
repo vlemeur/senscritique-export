@@ -9,7 +9,18 @@ logger = logging.getLogger(__name__)
 
 
 def get_music_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a music row."""
+    """Returns a dict containing infos for a music row.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Dict
+        music row infos
+    """
     return {
         "Rank": row_utils.get_rank(row),
         "Title": row_utils.get_title(row),
@@ -26,7 +37,13 @@ def get_music_infos_from_row(row: element.Tag) -> Dict:
 
 
 def get_order_music_columns() -> List:
-    """Returns the order of columns for music rows."""
+    """Returns the order of columns for music rows.
+
+    Returns
+    -------
+    List
+        order columns for music rows
+    """
     return [
         "Rank",
         "Title",

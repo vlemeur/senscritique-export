@@ -9,7 +9,18 @@ logger = logging.getLogger(__name__)
 
 
 def get_track_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a track row."""
+    """Returns a dict containing infos for a track row.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Dict
+        track row infos
+    """
     return {
         "Rank": row_utils.get_rank(row),
         "Title": row_utils.get_title(row),
@@ -26,7 +37,13 @@ def get_track_infos_from_row(row: element.Tag) -> Dict:
 
 
 def get_order_track_columns() -> List:
-    """Returns the order of columns for track rows."""
+    """Returns the order of columns for track rows.
+
+    Returns
+    -------
+    List
+        order of columns
+    """
     return [
         "Rank",
         "Title",

@@ -9,7 +9,18 @@ logger = logging.getLogger(__name__)
 
 
 def get_books_infos_from_row(row: element.Tag) -> Dict:
-    """Returns a dict containing infos for a book row."""
+    """Returns a dict containing infos for a book row.
+
+    Parameters
+    ----------
+    row : element.Tag
+        row to consider
+
+    Returns
+    -------
+    Dict
+        book row infos
+    """
     return {
         "Rank": row_utils.get_rank(row),
         "Title": row_utils.get_title(row),
@@ -27,7 +38,13 @@ def get_books_infos_from_row(row: element.Tag) -> Dict:
 
 
 def get_order_books_columns() -> List:
-    """Returns the order of columns for books rows."""
+    """Returns the order of columns for books rows.
+
+    Returns
+    -------
+    List
+        book rows columns order
+    """
     return [
         "Rank",
         "Title",
