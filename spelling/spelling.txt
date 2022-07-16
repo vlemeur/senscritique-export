@@ -320,3 +320,11 @@ resample
 resampled
 resampler
 resampling
+
+# Senscritique related
+url
+URL
+plateform
+plateforms
+topchart
+videogames
