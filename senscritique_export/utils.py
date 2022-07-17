@@ -98,11 +98,10 @@ def get_dict_available_pages(soup: BeautifulSoup) -> Dict[int, str]:
     Dict[int, str]
         available pages
     """
-    dict_links = {
+    return {
         int(x["data-sc-pager-page"]): "https://old.senscritique.com" + x["href"]
         for x in soup.find_all("a", {"class": "eipa-anchor"})
     }
-    return dict_links
 
 
 def get_next_collection_link(soup: BeautifulSoup) -> Optional[str]:
@@ -119,8 +118,7 @@ def get_next_collection_link(soup: BeautifulSoup) -> Optional[str]:
         Next link
     """
     available_pages = get_dict_available_pages(soup)
-    current_page = get_collection_current_page_number(soup)
-    if current_page:
+    if current_page := get_collection_current_page_number(soup):
         if available_pages.get(current_page + 1):
             return available_pages.get(current_page + 1)
     return None

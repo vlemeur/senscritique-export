@@ -2,6 +2,7 @@
 import logging
 from typing import Dict, Optional
 
+import senscritique_export.constants as cst
 from senscritique_export.utils import format_number, get_soup
 
 logger = logging.getLogger(__name__)
@@ -27,18 +28,18 @@ class Work:  # pylint: disable=too-many-instance-attributes
         """
         return {
             **{
-                "Title": self.title,
-                "URL": self.url,
+                cst.TITLE: self.title,
+                cst.URL: self.url,
                 "Rating": self.main_rating,
                 "Rating Details": self.rating_details,  # type: ignore
-                "Year": self.year,
+                cst.YEAR: self.year,
                 "Cover URL": self.cover_url,
                 "Review Count": self.review_count,
                 "Vote Count": self.vote_count,
                 "Favorite Count": self.favorite_count,
                 "Wishlist Count": self.wishlist_count,
                 "In Progress Count": self.in_progress_count,
-                "Description": self.description,
+                cst.DESCRIPTION: self.description,
             },
             **self.get_complementary_info(),
             **{"Category": self.category},
@@ -290,50 +291,50 @@ class Work:  # pylint: disable=too-many-instance-attributes
             )
             if self.category == "Movie":
                 return {
-                    "Producer": creator,
-                    "Genre": complementary_info[1],
-                    "Length": complementary_info[2],
-                    "Release Date": complementary_info[3],
+                    cst.PRODUCER: creator,
+                    cst.GENRE: complementary_info[1],
+                    cst.LENGTH: complementary_info[2],
+                    cst.RELEASE_DATE: complementary_info[3],
                 }
             if self.category == "Series":
                 return {
-                    "Producer": creator,
-                    "Genre": complementary_info[1],
+                    cst.PRODUCER: creator,
+                    cst.GENRE: complementary_info[1],
                     "Season Number": complementary_info[2],
                     "Editor": complementary_info[3],
                     "Episode Length": complementary_info[4],
-                    "Release Date": complementary_info[5],
+                    cst.RELEASE_DATE: complementary_info[5],
                 }
             if self.category == "Video Game":
                 return {
-                    "Developer": creator,
-                    "Platforms": complementary_info[1],
-                    "Genre": complementary_info[2],
-                    "Release Date": complementary_info[3],
+                    cst.DEVELOPER: creator,
+                    cst.PLATEFORMS: complementary_info[1],
+                    cst.GENRE: complementary_info[2],
+                    cst.RELEASE_DATE: complementary_info[3],
                 }
             if self.category == "Book":
                 return {
                     "Writer": creator,
-                    "Genre": complementary_info[1],
-                    "Release Date": complementary_info[2],
+                    cst.GENRE: complementary_info[1],
+                    cst.RELEASE_DATE: complementary_info[2],
                 }
             if self.category == "Comics":
                 return {
                     "Writer": creator,
-                    "Release Date": complementary_info[1],
+                    cst.RELEASE_DATE: complementary_info[1],
                 }
             if self.category == "Music":
                 return {
-                    "Artist": creator,
-                    "Genre": complementary_info[1],
+                    cst.ARTIST: creator,
+                    cst.GENRE: complementary_info[1],
                     "Label": complementary_info[2],
-                    "Release Date": complementary_info[3],
+                    cst.RELEASE_DATE: complementary_info[3],
                 }
             if self.category == "Track":
                 return {
-                    "Artist": creator,
-                    "Length": complementary_info[1],
-                    "Release Date": complementary_info[2],
+                    cst.ARTIST: creator,
+                    cst.LENGTH: complementary_info[1],
+                    cst.RELEASE_DATE: complementary_info[2],
                 }
             logger.warning(f"Category {self.category} not supported.")
             return {}
