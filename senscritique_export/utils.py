@@ -707,7 +707,44 @@ def get_topchart_order(category: str) -> List:
         logger.error(f"Category {category} not supported.")
     return result
 
-def get_token(path_token_file: Path) -> str:
-    with open(path_token_file, "w") as token_file:
+
+def get_credentials(path_credentials: Path) -> Dict[str, str]:
+    """Returns a dict containing credentials names as key and associated
+    values as values
+
+    Parameters
+    ----------
+    path_credentials : Path
+        credentials file
+
+    Returns
+    -------
+    Dict[str, str]
+        credentials dict
+    """
+    with open(file=path_credentials, mode="r") as token_file:
         lines = token_file.readlines()
-    stop = "here"
+    credientials = {}
+    for line in lines:
+        field_name, field = line.split("=")
+        credientials[field_name] = field.replace("\n", "")
+
+    return credientials
+
+
+def get_token(path_credentials: Path) -> str:
+    """Returns token from a txt credential file
+
+    Parameters
+    ----------
+    path_credentials : Path
+        path to credentials
+
+    Returns
+    -------
+    str
+        Notion token
+    """
+
+    credentials = get_credentials(path_credentials=path_credentials)
+    return credentials["NOTION_TOKEN"]
