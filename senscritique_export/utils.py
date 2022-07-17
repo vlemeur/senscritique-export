@@ -2,6 +2,7 @@
 
 import difflib
 import logging
+from pathlib import Path
 import urllib
 from typing import Dict, List, Optional
 
@@ -705,3 +706,8 @@ def get_topchart_order(category: str) -> List:
         result = []
         logger.error(f"Category {category} not supported.")
     return result
+
+def get_token(path_token_file: Path) -> str:
+    with open(path_token_file, "w") as token_file:
+        lines = token_file.readlines()
+    stop = "here"

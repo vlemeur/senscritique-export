@@ -2,6 +2,10 @@
 
 Python scripts and module to export data from Senscritique.com
 
+## Usage
+
+- Before starting, please follow the instructions to create a new [integration](https://www.notion.so/my-integrations) and [add it to your Notion page or database](https://developers.notion.com/docs/getting-started#step-2-share-a-database-with-your-integration).
+
 ## Installation
 
 The source code is stored on Jfrog and requires associated login and password.
