@@ -138,6 +138,7 @@ data
 *.joblib
 *.parquet
 *.csv
+*.txt
 
 # Data Credentials
 *credential*
