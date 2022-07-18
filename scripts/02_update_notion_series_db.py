@@ -8,6 +8,8 @@ from senscritique_export.notion_export import update_notion_db_series
 if __name__ == "__main__":
 
     PATH_CREDENTIALS = Path(__file__).parent / "credentials.txt"
+
+    # Replace following name by a valid senscritique user name
     USER_NAME = "Jigot"
 
     api_key = get_token(path_credentials=PATH_CREDENTIALS)

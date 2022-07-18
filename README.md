@@ -5,6 +5,11 @@ Python scripts and module to export data from Senscritique.com
 ## Usage
 
 - Before starting, please follow the instructions to create a new [integration](https://www.notion.so/my-integrations) and [add it to your Notion page or database](https://developers.notion.com/docs/getting-started#step-2-share-a-database-with-your-integration).
+- Clone the repository `git clone git@github.com:vlemeur/senscritique-export.git`
+- Create in Notion a new Database called "Series" and get its url
+- Fill the credentials with database url and notion token
+- Fill the script located at `/scripts/02_update_notion_series_db.py` with a senscritique user name
+- Run the script
 
 ## Installation
 
