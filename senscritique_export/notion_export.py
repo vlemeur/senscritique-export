@@ -168,8 +168,8 @@ def update_notion_db_series(notion_database_url: str, api_key: str, user: str, t
 
     # Upload the diff
     if nb_diff == 0:
-        logger.info("No new entry to upload from senscritique.")
+        logger.warning("No new entry to upload from senscritique.")
     else:
-        logger.info(f"Uploading {nb_diff} new entries to notion...")
+        logger.warning(f"Uploading {nb_diff} new entries to notion...")
         upload(df=df_diff, notion_url=notion_database_url, title=title_page)
-        logger.info("Upload completed.")
+        logger.warning("Upload completed.")

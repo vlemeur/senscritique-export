@@ -723,7 +723,7 @@ def get_credentials(path_credentials: Path) -> Dict[str, str]:
     Dict[str, str]
         credentials dict
     """
-    with open(file=path_credentials, mode="r") as token_file:
+    with open(file=path_credentials, mode="r", encoding="utf8") as token_file:
         lines = token_file.readlines()
     credientials = {}
     for line in lines:
