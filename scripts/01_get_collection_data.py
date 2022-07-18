@@ -1,3 +1,4 @@
+"""Script used to get a collection from senscritique from a user name"""
 import pandas as pd
 
 from senscritique_export.scrapper import get_user_collection

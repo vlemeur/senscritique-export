@@ -2,13 +2,14 @@
 
 import difflib
 import logging
-from pathlib import Path
 import urllib
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import requests
 from bs4 import BeautifulSoup, element
 
+import senscritique_export.constants as cst
 from senscritique_export.row_utils.books_utils import get_books_info_from_row, get_order_books_columns
 from senscritique_export.row_utils.comics_utils import get_comics_info_from_row, get_order_comics_columns
 from senscritique_export.row_utils.movies_utils import get_movies_info_from_row, get_order_movies_columns
@@ -305,7 +306,7 @@ def get_complementary_info_collection(row: element.Tag) -> Dict:
 
     dict_info["Recommended"] = "True" if action.find("span", {"class": "eins-user-recommend"}) else "False"
 
-    dict_info["User Rating"] = action.text.strip()
+    dict_info[cst.USER_RATING] = action.text.strip()
     logger.debug(dict_info)
     return dict_info
 
@@ -726,7 +727,8 @@ def get_credentials(path_credentials: Path) -> Dict[str, str]:
         lines = token_file.readlines()
     credientials = {}
     for line in lines:
-        field_name, field = line.split("=")
+        field_name = line.split("=")[0]
+        field = line[len(f"{field_name}=") :]
         credientials[field_name] = field.replace("\n", "")
 
     return credientials
@@ -747,4 +749,21 @@ def get_token(path_credentials: Path) -> str:
     """
 
     credentials = get_credentials(path_credentials=path_credentials)
-    return credentials["NOTION_TOKEN"]
+    return credentials[cst.NOTION_TOKEN]
+
+
+def get_db_series_url(path_credentials: Path) -> str:
+    """Returns db series url from credentials
+
+    Parameters
+    ----------
+    path_credentials : Path
+        path to credentials
+
+    Returns
+    -------
+    str
+        senscritique db series url
+    """
+    credentials = get_credentials(path_credentials=path_credentials)
+    return credentials[cst.SERIES_DB_URL]
