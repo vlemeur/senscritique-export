@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def remove_accent_from_df(df: pd.DataFrame) -> pd.DataFrame:
-    """Remove all accents from data fiel
+    """Remove all accents from data entries
 
     Parameters
     ----------
@@ -36,12 +36,12 @@ def get_df_from_notion(notion_database_url: str, api_key: Optional[str] = None) 
     notion_database_url : str
         url to notion database
     api_key : Optional[str], optional
-        notion api key, by default None
+        notion API key, by default None
 
     Returns
     -------
     pd.DataFrame
-        notion dabase
+        notion database
     """
     if api_key is not None:
         config(api_key=api_key)
@@ -69,12 +69,12 @@ def convert_french_date_to_str(french_date: str) -> str:
         day = 1
         month = 1
     else:
-        day, month, year = french_split
-        month = cst.FRENCH_MONTHS[month]
+        day, month, year = french_split  # type: ignore
+        month = cst.FRENCH_MONTHS[month]  # type: ignore
         day = int(day)
-    year = int(year)
+    year = int(year)  # type: ignore
 
-    return datetime(year=year, month=month, day=day).strftime("%m/%d/%Y")
+    return datetime(year=year, month=month, day=day).strftime("%m/%d/%Y")  # type: ignore
 
 
 def convert_nb_seasons(nb_seasons: str) -> int:
@@ -119,11 +119,11 @@ def prepare_sens_critique_series(user: str, target_columns: List[str], api_key: 
     target_columns : List[str]
         columns to consider
     api_key : Optional[str], optional
-        notion api key, by default None
+        notion API key, by default None
 
     Returns
     -------
-    pd.DataFreame
+    pd.DataFrame
         senscritique series data ready to be uploaded to notion
     """
 
@@ -148,7 +148,7 @@ def update_notion_db_series(notion_database_url: str, api_key: str, user: str, t
     notion_database_url : str
         url to notion database
     api_key : str
-        notion api key
+        notion API key
     user : str
         senscritique user name
     title_page : str
