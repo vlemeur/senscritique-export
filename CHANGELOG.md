@@ -9,4 +9,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- ✨ Add export Senscritique series database script to Notion: [PR#2](https://github.com/vlemeur/senscritique-export/pull/2)
 - ✨ Senscritique scrapper added: [PR#1](https://github.com/vlemeur/senscritique-export/pull/1)

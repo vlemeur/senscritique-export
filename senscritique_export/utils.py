@@ -3,11 +3,13 @@
 import difflib
 import logging
 import urllib
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import requests
 from bs4 import BeautifulSoup, element
 
+import senscritique_export.constants as cst
 from senscritique_export.row_utils.books_utils import get_books_info_from_row, get_order_books_columns
 from senscritique_export.row_utils.comics_utils import get_comics_info_from_row, get_order_comics_columns
 from senscritique_export.row_utils.movies_utils import get_movies_info_from_row, get_order_movies_columns
@@ -98,11 +100,10 @@ def get_dict_available_pages(soup: BeautifulSoup) -> Dict[int, str]:
     Dict[int, str]
         available pages
     """
-    dict_links = {
+    return {
         int(x["data-sc-pager-page"]): "https://old.senscritique.com" + x["href"]
         for x in soup.find_all("a", {"class": "eipa-anchor"})
     }
-    return dict_links
 
 
 def get_next_collection_link(soup: BeautifulSoup) -> Optional[str]:
@@ -119,8 +120,7 @@ def get_next_collection_link(soup: BeautifulSoup) -> Optional[str]:
         Next link
     """
     available_pages = get_dict_available_pages(soup)
-    current_page = get_collection_current_page_number(soup)
-    if current_page:
+    if current_page := get_collection_current_page_number(soup):
         if available_pages.get(current_page + 1):
             return available_pages.get(current_page + 1)
     return None
@@ -306,7 +306,7 @@ def get_complementary_info_collection(row: element.Tag) -> Dict:
 
     dict_info["Recommended"] = "True" if action.find("span", {"class": "eins-user-recommend"}) else "False"
 
-    dict_info["User Rating"] = action.text.strip()
+    dict_info[cst.USER_RATING] = action.text.strip()
     logger.debug(dict_info)
     return dict_info
 
@@ -707,3 +707,63 @@ def get_topchart_order(category: str) -> List:
         result = []
         logger.error(f"Category {category} not supported.")
     return result
+
+
+def get_credentials(path_credentials: Path) -> Dict[str, str]:
+    """Returns a dict containing credentials names as key and associated
+    values as values
+
+    Parameters
+    ----------
+    path_credentials : Path
+        credentials file
+
+    Returns
+    -------
+    Dict[str, str]
+        credentials dict
+    """
+    with open(file=path_credentials, mode="r", encoding="utf8") as token_file:
+        lines = token_file.readlines()
+    credientials = {}
+    for line in lines:
+        field_name = line.split("=")[0]
+        field = line[len(f"{field_name}=") :]
+        credientials[field_name] = field.replace("\n", "")
+
+    return credientials
+
+
+def get_token(path_credentials: Path) -> str:
+    """Returns token from a txt credential file
+
+    Parameters
+    ----------
+    path_credentials : Path
+        path to credentials
+
+    Returns
+    -------
+    str
+        Notion token
+    """
+
+    credentials = get_credentials(path_credentials=path_credentials)
+    return credentials[cst.NOTION_TOKEN]
+
+
+def get_db_series_url(path_credentials: Path) -> str:
+    """Returns db series url from credentials
+
+    Parameters
+    ----------
+    path_credentials : Path
+        path to credentials
+
+    Returns
+    -------
+    str
+        senscritique db series url
+    """
+    credentials = get_credentials(path_credentials=path_credentials)
+    return credentials[cst.SERIES_DB_URL]
